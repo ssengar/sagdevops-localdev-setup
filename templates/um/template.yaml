@@ -1,0 +1,82 @@
+###############################################################################
+#  Copyright 2013 - 2018 Software AG, Darmstadt, Germany and/or its licensors
+#
+#   SPDX-License-Identifier: Apache-2.0
+#
+#     Licensed under the Apache License, Version 2.0 (the "License");
+#     you may not use this file except in compliance with the License.
+#     You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#     Unless required by applicable law or agreed to in writing, software
+#     distributed under the License is distributed on an "AS IS" BASIS,
+#     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#     See the License for the specific language governing permissions and
+#     limitations under the License.                                                            
+#
+###############################################################################
+alias: sag-um-server
+description: Universal Messaging Realm server
+
+environments:
+  default:
+    um.numrealmserver.license.key: "*_NUMWF_10.*_*_*" # UM license key
+    um.instance.name:    default            # server instance name
+    um.realm:            default            # realm name
+    um.instance.port:    ${}               # main listener port number
+    um.jmx.port:         ${}               # jmx port number
+    um.memory.init:      ${}                 # initial memory size in MB
+    um.memory.max:       ${}                # maximum memory size in MB
+    um.memory.direct:    1G                 # direct memory size
+    um.fixes:                               # minimal recommended set of fixes to apply
+      - wMFix.NUMRealmServer                # Universal Messaging Realm Server fix
+      - wMFix.NUMspmBundles                 # Universal Messaging SPM Plugin fix
+
+layers:
+  runtime:
+    productRepo: ${repo.product}            # default repository to install products from
+    fixRepo:     ${repo.fix}                # default repository to install fixes from
+    templates:
+      - um-server                           # template to apply
+
+templates:
+  um-server:
+    licenses:                               # lisenses to copy from central license repository
+      "UniversalMessaging/server/templates/licence.xml": "${um.numrealmserver.license.key}" # license file
+    fixes: ${um.fixes}                      # fixes to install
+    products:
+      NUMspm:
+      NUMMigration:
+      NUMClient:
+      NUMInstanceManager:
+      NUMTemplateApplications:
+      NUMEnterpriseManager:
+        ${node.alias}:
+          runtimeComponentId: Universal-Messaging-${instance.name}                               # products to install
+      NUMRealmServer:                                              # Universal Messaging | Realm Server
+        ${um.instance.name}:                                       # instance name is different from realm
+          instance.port: ${um.instance.port}                       # instance port
+          # instance.ip:   ${node.host}                              # bind to node's host name
+          runtimeComponentId: Universal-Messaging-${instance.name} # hint for CC to skip instance creation if it exists
+          configuration:
+            Universal-Messaging-${instance.name}:                  # configuration for UM instance
+              COMMON-MEMORY: 
+                COMMON-MEMORY:                                     # memory configuration
+                  InitSize: ${um.memory.init}                      # initial JVM memory size
+                  MaxSize:  ${um.memory.max}                       # maximum JVM memory size
+                  ExtendedProperties:                              
+                    Property: 
+                      - 
+                       "@name": "-XX:MaxDirectMemorySize"
+                       $: ${um.memory.direct}                     # JVM maximum direct memory size 
+              COMMON-JAVASYSPROPS: 
+                COMMON-JAVASYSPROPS:  
+                   REALM: ${um.realm}                                # realm name IMPORTANT: this can only be set before first startup
+                   com.sun.management.jmxremote.port: ${um.jmx.port} # JVM JMX port number
+                   com.sun.management.jmxremote.authenticate: false  # do not use JMX authentication
+                   com.sun.management.jmxremote.ssl: false           # do not use JMX SSL
+            
+provision:
+  default:
+    runtime: ${nodes} # apply to selected nodes

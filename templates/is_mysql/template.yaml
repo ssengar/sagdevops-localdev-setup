@@ -1,0 +1,241 @@
+###############################################################################
+# Copyright (c) 2011-2019 Software AG, Darmstadt, Germany and/or Software AG USA Inc., Reston, VA, USA, and/or its subsidiaries and/or its affiliates and/or their licensors.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+###############################################################################
+alias: sag-is-mysql
+description: Integration Server core
+
+environments:
+  default:
+    is.integrationserver.license.key: "*_PIE_10.*_*_*"  # IS license key
+    testSuite.license.key: "*_GWMTS_*_*_*"
+    is.instance.name:   default                         # Instance name
+    is.primary.port:    ${}                            # Primary port number
+    is.diagnostic.port: ${}                            # Dialgnostic port number
+    is.jmx.port:        ${}                            # JMX port number
+    is.memory.init:     ${}                             # Initial memory size
+    is.memory.max:      ${}                             # Maximum memory size
+    is.install.service: false
+    is.fixes:           ALL
+    db.username: ${}
+    db.password: ${}
+    db.name: webm
+    db.url: "jdbc:mysql://localhost:3306/${db.name}?autoReconnect=true&useSSL=false"    
+    db.type: mysql
+
+layers:
+  runtime:
+    productRepo: ${repo.product}
+    fixRepo:     ${repo.fix}
+    templates:
+      - is-server        
+
+templates:
+  is-server:
+    licenses:
+      "IntegrationServer/config/licenseKey.xml": "${is.integrationserver.license.key}"
+    fixes: ${is.fixes}
+    products:
+      jdbcAdapter:
+      GWM_IS:
+      GWMCommonLibs:
+      SBPPackage:
+      WPEDesigner_ja:
+      brmspackage:
+      wmprt:
+      integrationServer:
+        ${is.instance.name}: 
+          primary.port:    ${is.primary.port}
+          diagnostic.port: ${is.diagnostic.port}
+          jmx.port:        ${is.jmx.port}
+          license.file:    IntegrationServer/config/licenseKey.xml
+          install.service: ${is.install.service}
+          package.list:    WmART,WmARTExtDC,WmFlatFile,WmJDBCAdapter,WmServiceMock,WmPRT,WmBusinessRules,WmBusinessConsole,WmTaskAssets,WmTaskEngine
+          db.type:         ${db.type}
+          db.url:          "${db.url}"
+          db.username:     ${db.username}
+          db.password:     ${db.password}
+          configuration:
+            OSGI-IS_${is.instance.name}:
+              COMMON-MEMORY:
+                COMMON-MEMORY:
+                  InitSize: ${is.memory.init}
+                  MaxSize: ${is.memory.max}
+            integrationServer-${is.instance.name}:
+              COMMON-JDBC:
+                COMMON-JDBC-ISCoreAudit:
+                   Pool:
+                     '@alias': 'ISCoreAudit'
+                     Name: ISCoreAudit
+                     Description: ISCoreAudit
+                     MinSize: '0'
+                     MaxSize: '50'
+                     MaxIdleTime: '60000'
+                     CacheStatements: false
+                     DatabaseServer:
+                        '@type': mysql
+                        URL: "${db.url}"
+                        User: ${db.username}
+                        Password: ${db.password}
+                     ExtendedProperties:
+                      Property:
+                        -
+                           "@name": "AvailConnWarningThreshold"
+                           $: '0'
+                        -
+                           "@name": "WaitingThreadThresholdCount"
+                           $: '0'
+                COMMON-JDBC-ISInternal:
+                   Pool:
+                     '@alias': 'ISInternal'
+                     Name: ISInternal
+                     Description: ISInternal
+                     MinSize: '0'
+                     MaxSize: '50'
+                     MaxIdleTime: '60000'
+                     CacheStatements: false
+                     DatabaseServer:
+                        '@type': mysql
+                        URL: "${db.url}"
+                        User: ${db.username}
+                        Password: ${db.password}
+                     ExtendedProperties:
+                      Property:
+                        -
+                           "@name": "AvailConnWarningThreshold"
+                           $: '0'
+                        -
+                           "@name": "WaitingThreadThresholdCount"
+                           $: '0'
+                COMMON-JDBC-DocumentHistory:
+                   Pool:
+                     '@alias': 'DocumentHistory'
+                     Name: DocumentHistory
+                     Description: DocumentHistory
+                     MinSize: '0'
+                     MaxSize: '50'
+                     MaxIdleTime: '60000'
+                     CacheStatements: false
+                     DatabaseServer:
+                        '@type': mysql
+                        URL: "${db.url}"
+                        User: ${db.username}
+                        Password: ${db.password}
+                     ExtendedProperties:
+                      Property:
+                        -
+                           "@name": "AvailConnWarningThreshold"
+                           $: '0'
+                        -
+                           "@name": "WaitingThreadThresholdCount"
+                           $: '0'
+                COMMON-JDBC-Archive:
+                   Pool:
+                     '@alias': 'Archive'
+                     Name: Archive
+                     Description: Archive
+                     MinSize: '0'
+                     MaxSize: '50'
+                     MaxIdleTime: '60000'
+                     CacheStatements: false
+                     DatabaseServer:
+                        '@type': mysql
+                        URL: "${db.url}"
+                        User: ${db.username}
+                        Password: ${db.password}
+                     ExtendedProperties:
+                      Property:
+                        -
+                           "@name": "AvailConnWarningThreshold"
+                           $: '0'
+                        -
+                           "@name": "WaitingThreadThresholdCount"
+                           $: '0'
+                COMMON-JDBC-ProcessAudit:
+                   Pool:
+                     '@alias': 'ProcessAudit'
+                     Name: ProcessAudit
+                     Description: ProcessAudit
+                     MinSize: '0'
+                     MaxSize: '50'
+                     MaxIdleTime: '60000'
+                     CacheStatements: false
+                     DatabaseServer:
+                        '@type': mysql
+                        URL: "${db.url}"
+                        User: ${db.username}
+                        Password: ${db.password}
+                     ExtendedProperties:
+                      Property:
+                        -
+                           "@name": "AvailConnWarningThreshold"
+                           $: '0'
+                        -
+                           "@name": "WaitingThreadThresholdCount"
+                           $: '0'                          
+              COMMON-DBFUNCTION:
+                COMMON-DBFUNCTION-ISInternal:
+                  Function:
+                    "@alias": "ISInternal"
+                    PoolAlias: ISInternal
+                    Description: "For internal use by IS facilities"
+                COMMON-DBFUNCTION-ISCoreAudit:
+                  Function:
+                    "@alias": "ISCoreAudit"
+                    PoolAlias: ISCoreAudit
+                    Description: "IS Core Audit Log Manager Function"
+                COMMON-DBFUNCTION-Xref:
+                  Function:
+                    "@alias": "Xref"
+                    PoolAlias: ISCoreAudit
+                    Description: "Key Cross Referencing and Echo Suppression"
+                COMMON-DBFUNCTION-DocumentHistory:
+                  Function:
+                    "@alias": "DocumentHistory"
+                    PoolAlias: DocumentHistory
+                    Description: "Document History for Exactly Once Processing"
+                COMMON-DBFUNCTION-ProcessAudit:
+                  Function:
+                    "@alias": "ProcessAudit"
+                    PoolAlias: ProcessAudit
+                    Description: "Process Audit Log Manager Function"
+                COMMON-DBFUNCTION-ProcessEngine:
+                  Function:
+                    "@alias": "ProcessEngine"
+                    PoolAlias: ProcessAudit
+                    Description: "Process Audit Log Manager Function"
+                COMMON-DBFUNCTION-Archive:
+                  Function:
+                    "@alias": "Archive"
+                    PoolAlias: Archive
+                    Description: "Archiving"                       
+                IS-RESOURCES:
+                  Resources:
+                    ServerThreadPool:
+                      MaximumThreads: ${is.max.threads}
+                      MinimumThreads: ${is.min.threads}
+                      AvailableThreadsWarningThreshold: 15
+                      SchedulerThreadThrottle: 75
+                    Session:
+                      SessionTimeout: ${is.session.timeout}
+                      EnableStatefulSessionLimit: true
+                      MaximumStatefulSessions: 2147483647
+                      AvailableStatefulSessionWarningThreshold: 25
+           
+provision:
+  default:
+    runtime: ${nodes}
