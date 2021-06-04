@@ -23,23 +23,15 @@ echo "============== Start at %start_datetime% ==================" >> %log_file%
 echo Clone the sagdevops-cc-server GIT repo
 
 set remote_repo=https://github.com/SoftwareAG/sagdevops-cc-server
-rem set local_repo=%cicdhome_dir%\sagdevops-cc-server
+
+rem git clone --recursive -b release/105oct2019 https://github.com/SoftwareAG/sagdevops-cc-server >> %log_file%
+
 git -C %cicdhome_dir%\sagdevops-cc-server pull || git --recursive -b release/105oct2019 clone remote_repo
 IF %errorlevel% NEQ 0 (
 	echo Non-zero exit code %errorlevel% was returned. Exit the process.
 	rem endlocal	
 	EXIT /B %errorlevel%
 )
-
-
-
-rem git clone --recursive -b release/105oct2019 https://github.com/SoftwareAG/sagdevops-cc-server >> %log_file%
-rem IF %errorlevel% NEQ 0 (
-rem 	echo Non-zero exit code %errorlevel% was returned. Exit the process.
-rem 	rem endlocal	
-rem 	EXIT /B %errorlevel%
-rem )
-
 
 powershell.exe -NoProfile -InputFormat None -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12;iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/SoftwareAG/sagdevops-antcc/release/104apr2019/bootstrap/install.ps1'))"
 
