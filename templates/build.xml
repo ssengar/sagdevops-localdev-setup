@@ -1,6 +1,6 @@
 <project name = "java-ant project" default = "copy_jars">  
     <target name="copy_jars">  
-        <copy file="mysql-connector-java-5.1.47.jar" todir="${user.home}/sag/cc/profiles/CCE/data/templates/composite/sag-db-mysql/"/>
-		<copy file="mssql-jdbc-6.4.0.jre8.jar" todir="${user.home}/sag/cc/profiles/CCE/data/templates/composite/sag-db-sqlserver/"/>        		
+        <copy file="jars/mysql-connector-java-5.1.47.jar" todir="${user.home}/sag/cc/profiles/CCE/data/templates/composite/sag-db-mysql/"/>
+		<copy file="jars/mssql-jdbc-6.4.0.jre8.jar" todir="${user.home}/sag/cc/profiles/CCE/data/templates/composite/sag-db-sqlserver/"/>        		
     </target>  
 </project> 
