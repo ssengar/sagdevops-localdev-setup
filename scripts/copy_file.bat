@@ -14,11 +14,6 @@ SET src_dir=%src_dir%
 SET target_dir=%target_dir%
 echo local dev directory:%src_dir%
 echo sagdevops CCE directory:%target_dir%
-IF NOT EXIST %src_dir% MKDIR %src_dir%
-cd %src_dir%
-git -C %src_dir%/sagdevops-localdev-setup pull || git clone https://github.com/saigandi/sagdevops-localdev-setup.git
-echo Clone the sagdevops-cc-server GIT repo
-echo.
 IF NOT EXIST %target_dir% MKDIR %target_dir%
 cd %target_dir%
 git -C %target_dir%/sagdevops-cc-server pull || git clone --recursive -b release/105oct2019 https://github.com/SoftwareAG/sagdevops-cc-server 
