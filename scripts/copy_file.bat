@@ -8,7 +8,7 @@ rem #
 rem #############################################
 
 rem Read CCE and CICD setup related values from a properties file 
-FOR /F "eol=# tokens=1,2 delims==" %%G IN (..\config\ldev-setup.properties) DO (set %%G=%%H)  
+FOR /F "eol=# tokens=1,2 delims==" %%G IN (..\config\cce-setup.properties) DO (set %%G=%%H)  
 
 SET src_dir=%src_dir%
 SET target_dir=%target_dir%
